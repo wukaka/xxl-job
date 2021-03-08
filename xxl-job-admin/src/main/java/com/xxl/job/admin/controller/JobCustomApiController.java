@@ -1,31 +1,27 @@
 package com.xxl.job.admin.controller;
 
+import com.xxl.job.admin.controller.annotation.PermissionLimit;
 import com.xxl.job.admin.core.model.XxlJobGroup;
+import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.model.XxlJobRegistry;
 import com.xxl.job.admin.core.util.I18nUtil;
 import com.xxl.job.admin.dao.XxlJobGroupDao;
 import com.xxl.job.admin.dao.XxlJobInfoDao;
 import com.xxl.job.admin.dao.XxlJobRegistryDao;
+import com.xxl.job.admin.service.XxlJobService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.RegistryConfig;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-/**
- * job group controller
- *
- * @author xuxueli 2016-10-02 20:52:56
- */
 @Controller
-@RequestMapping("/jobgroup")
-public class JobGroupController {
+@RequestMapping("/custom/api")
+public class JobCustomApiController {
 
     @Resource
     private XxlJobInfoDao xxlJobInfoDao;
@@ -36,32 +32,12 @@ public class JobGroupController {
     @Resource
     private XxlJobRegistryDao xxlJobRegistryDao;
 
-    @RequestMapping
-    public String index(Model model) {
-        return "jobgroup/jobgroup.index";
-    }
+    @Resource
+    private XxlJobService xxlJobService;
 
-    @RequestMapping("/pageList")
+    @PostMapping("/group/save")
     @ResponseBody
-    public Map<String, Object> pageList(HttpServletRequest request,
-                                        @RequestParam(required = false, defaultValue = "0") int start,
-                                        @RequestParam(required = false, defaultValue = "10") int length,
-                                        String appname, String title) {
-
-        // page query
-        List<XxlJobGroup> list = xxlJobGroupDao.pageList(start, length, appname, title);
-        int list_count = xxlJobGroupDao.pageListCount(start, length, appname, title);
-
-        // package result
-        Map<String, Object> maps = new HashMap<String, Object>();
-        maps.put("recordsTotal", list_count);        // 总记录数
-        maps.put("recordsFiltered", list_count);    // 过滤后的总记录数
-        maps.put("data", list);                    // 分页列表
-        return maps;
-    }
-
-    @RequestMapping("/save")
-    @ResponseBody
+    @PermissionLimit(limit = false)
     public ReturnT<String> save(XxlJobGroup xxlJobGroup) {
 
         // valid
@@ -103,8 +79,9 @@ public class JobGroupController {
         return (ret > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
     }
 
-    @RequestMapping("/update")
+    @RequestMapping("/group/update")
     @ResponseBody
+    @PermissionLimit(limit = false)
     public ReturnT<String> update(XxlJobGroup xxlJobGroup) {
         // valid
         if (xxlJobGroup.getAppname() == null || xxlJobGroup.getAppname().trim().length() == 0) {
@@ -171,8 +148,9 @@ public class JobGroupController {
         return appAddressMap.get(appnameParam);
     }
 
-    @RequestMapping("/remove")
+    @RequestMapping("/group/remove")
     @ResponseBody
+    @PermissionLimit(limit = false)
     public ReturnT<String> remove(int id) {
 
         // valid
@@ -190,11 +168,19 @@ public class JobGroupController {
         return (ret > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
     }
 
-    @RequestMapping("/loadById")
+    @RequestMapping("/group/loadById")
     @ResponseBody
+    @PermissionLimit(limit = false)
     public ReturnT<XxlJobGroup> loadById(int id) {
         XxlJobGroup jobGroup = xxlJobGroupDao.load(id);
         return jobGroup != null ? new ReturnT<XxlJobGroup>(jobGroup) : new ReturnT<XxlJobGroup>(ReturnT.FAIL_CODE, null);
+    }
+
+    @PostMapping("/job/add")
+    @ResponseBody
+    @PermissionLimit(limit = false)
+    public ReturnT<String> add(XxlJobInfo jobInfo) {
+        return xxlJobService.add(jobInfo);
     }
 
 }
