@@ -10,8 +10,10 @@ public class LogParam implements Serializable {
     private long logDateTim;
     private long logId;
     private int fromLineNum;
+
     public LogParam() {
     }
+
     public LogParam(long logDateTim, long logId, int fromLineNum) {
         this.logDateTim = logDateTim;
         this.logId = logId;

@@ -14,8 +14,10 @@ public class ExecutorBizClient implements ExecutorBiz {
     private String addressUrl;
     private String accessToken;
     private int timeout = 3;
+
     public ExecutorBizClient() {
     }
+
     public ExecutorBizClient(String addressUrl, String accessToken) {
         this.addressUrl = addressUrl;
         this.accessToken = accessToken;
